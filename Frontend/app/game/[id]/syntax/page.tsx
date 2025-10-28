@@ -190,7 +190,9 @@ export default function SyntaxGamePage() {
         }
 
         localStorage.setItem("gameResults", JSON.stringify(results))
+      
       }
+
       router.push(`/game/${gradeId}/completion`)
     }
   }

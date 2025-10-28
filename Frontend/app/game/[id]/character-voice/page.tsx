@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, Mic } from "lucide-react"
+import { CameraInline } from "@/components/camera-inline"
 
 const characters: { [key: string]: { name: string; emotion: string; example: string }[] } = {
   "2": [
@@ -96,6 +97,7 @@ export default function CharacterVoicePage() {
 
         {/* Game Container */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+          <CameraInline />
           {/* Instructions */}
           <div className="mb-8 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
             <p className="text-gray-700">
