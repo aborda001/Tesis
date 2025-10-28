@@ -87,7 +87,7 @@ export default function StudentResultsPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <p className="text-gray-600 text-sm">Puntaje</p>
-                        <p className="text-2xl font-bold text-blue-600">10</p>
+                        <p className="text-2xl font-bold text-blue-600">{result.puntaje}</p>
                       </div>
                       <div>
                         <p className="text-gray-600 text-sm">Descripción</p>

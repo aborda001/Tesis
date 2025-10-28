@@ -19,7 +19,7 @@ export default function CharacterVoicePage() {
   const gradeId = params.id as string
 
   const [characterList, setCharacterList] = useState<(typeof characters)["2"]>([])
-  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null)
+  const [selectedCharacter, setSelectedCharacter] = useState<string>("null")
   const [isRecording, setIsRecording] = useState(false)
   const [accuracy, setAccuracy] = useState(0)
   const [completedCharacters, setCompletedCharacters] = useState<string[]>([])
@@ -43,7 +43,7 @@ export default function CharacterVoicePage() {
       const simulatedAccuracy = Math.floor(Math.random() * 30) + 70
       setAccuracy(simulatedAccuracy)
 
-      if (!completedCharacters.includes(selectedCharacter)) {
+      if (!completedCharacters?.includes(selectedCharacter)) {
         setCompletedCharacters([...completedCharacters, selectedCharacter])
       }
     }
@@ -167,7 +167,7 @@ export default function CharacterVoicePage() {
         <div className="flex gap-4 justify-center">
           <button
             onClick={() => {
-              setSelectedCharacter(null)
+              setSelectedCharacter("null")
               setAccuracy(0)
               setIsRecording(false)
             }}
@@ -177,7 +177,6 @@ export default function CharacterVoicePage() {
           </button>
           <button
             onClick={handleNext}
-            disabled={completedCharacters.length < characterList.length}
             className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
           >
             Siguiente
