@@ -157,7 +157,7 @@ export default function CharacterVoicePage() {
           {accuracy > 0 && (
             <div className="bg-green-100 border-2 border-green-500 rounded-lg p-4 mb-6">
               <p className="text-green-800 font-semibold text-center">
-                ¡Excelente entonación! {accuracy}% de precisión
+                ¡Excelente entonación!
               </p>
             </div>
           )}
