@@ -107,8 +107,8 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
     },
     {
       id: "3",
-      words: ["un", "proyecto", "realizan", "grupo", "un"],
-      correctOrder: ["un", "grupo", "realiza", "un", "proyecto"],
+      words: ["un", "proyecto", "realizan", "grupo", "el"],
+      correctOrder: ["el", "grupo", "realiza", "un", "proyecto"],
       hint: "Trabajo colaborativo",
     },
   ],
@@ -121,8 +121,8 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
     },
     {
       id: "2",
-      words: ["los", "y", "conclusiones", "analizan", "datos", "los", "científicos"],
-      correctOrder: ["los", "científicos", "analizan", "los", "datos", "y", "conclusiones"],
+      words: ["los", "y", "conclusiones", "analizan", "datos", "científicos"],
+      correctOrder: ["los", "científicos", "analizan", "datos", "y", "conclusiones"],
       hint: "Análisis científico",
     },
     {
