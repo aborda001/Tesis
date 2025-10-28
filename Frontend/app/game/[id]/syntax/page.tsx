@@ -193,7 +193,7 @@ export default function SyntaxGamePage() {
       
       }
 
-      router.push(`/game/${gradeId}/completion`)
+      router.push(`/game/${gradeId}/character-voice`)
     }
   }
 
