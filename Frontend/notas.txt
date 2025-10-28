@@ -1,0 +1,4 @@
+Despues del juego de lectura de acuerdo a las palabras equivocadas:
+Anotar errores y mostrarlos al final,
+En todos los juegos de lectura que tenga uso de la camara
+Agregar edad y grado a los alumnos 
