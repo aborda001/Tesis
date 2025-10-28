@@ -138,7 +138,7 @@ export default function CharacterVoicePage() {
           {selectedCharacter && (
             <div className="mb-8 p-6 bg-purple-50 rounded-lg border-2 border-purple-200">
               <p className="text-center text-gray-700 mb-4">
-                Grábate diciendo la frase como si fueras {selectedCharacter.toLowerCase()}
+                Grábate diciendo la frase como el personaje que has seleccionado.
               </p>
               <div className="flex justify-center">
                 <button
