@@ -218,7 +218,6 @@ export default function GamePage() {
           {gradeId !== "1" && (
             <button
               onClick={handleNextClick}
-              disabled={accuracy < 50}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
             >
               Siguiente

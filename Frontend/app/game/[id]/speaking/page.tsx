@@ -226,7 +226,6 @@ export default function SpeakingGamePage() {
           </Button>
           <Button
             onClick={handleNextClick}
-            disabled={!recognizedText}
             className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Siguiente

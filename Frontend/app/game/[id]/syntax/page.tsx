@@ -55,14 +55,14 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
   "3": [
     {
       id: "1",
-      words: ["parque", "por", "corre", "perro", "el", "el"],
-      correctOrder: ["el", "perro", "corre", "por", "el", "parque"],
+      words: ["plaza", "por", "corre", "perro", "la", "el"],
+      correctOrder: ["el", "perro", "corre", "por", "la", "plaza"],
       hint: "Oración completa con lugar",
     },
     {
       id: "2",
-      words: ["escuela", "la", "a", "va", "niña", "la"],
-      correctOrder: ["la", "niña", "va", "a", "la", "escuela"],
+      words: ["escuela", "el", "a", "va", "niño", "la"],
+      correctOrder: ["el", "niño", "va", "a", "la", "escuela"],
       hint: "Oración con destino",
     },
     {
