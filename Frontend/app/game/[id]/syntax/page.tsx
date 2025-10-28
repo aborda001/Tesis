@@ -55,19 +55,19 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
   "3": [
     {
       id: "1",
-      words: ["parque", "por", "corre", "perro", "el"],
+      words: ["parque", "por", "corre", "perro", "el", "el"],
       correctOrder: ["el", "perro", "corre", "por", "el", "parque"],
       hint: "Oración completa con lugar",
     },
     {
       id: "2",
-      words: ["escuela", "a", "va", "niña", "la"],
+      words: ["escuela", "la", "a", "va", "niña", "la"],
       correctOrder: ["la", "niña", "va", "a", "la", "escuela"],
       hint: "Oración con destino",
     },
     {
       id: "3",
-      words: ["juego", "en", "juegan", "niños", "los"],
+      words: ["juego", "en", "el", "juegan", "niños", "los"],
       correctOrder: ["los", "niños", "juegan", "en", "el", "juego"],
       hint: "Oración con lugar",
     },
@@ -81,13 +81,13 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
     },
     {
       id: "2",
-      words: ["biblioteca", "en", "lee", "profesor", "el"],
+      words: ["biblioteca", "en", "lee", "profesor", "la", "el"],
       correctOrder: ["el", "profesor", "lee", "en", "la", "biblioteca"],
       hint: "Oración con lugar",
     },
     {
       id: "3",
-      words: ["computadora", "usa", "alumno", "el"],
+      words: ["la", "computadora", "usa", "alumno", "el"],
       correctOrder: ["el", "alumno", "usa", "la", "computadora"],
       hint: "Sujeto, verbo, objeto",
     },
@@ -101,13 +101,13 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
     },
     {
       id: "2",
-      words: ["internet", "en", "investigan", "información", "los", "alumnos"],
-      correctOrder: ["los", "alumnos", "investigan", "información", "en", "internet"],
+      words: ["internet", "en", "investigan", "los", "alumnos"],
+      correctOrder: ["los", "alumnos", "investigan", "en", "internet"],
       hint: "Oración compleja",
     },
     {
       id: "3",
-      words: ["proyecto", "realizan", "grupo", "un"],
+      words: ["un", "proyecto", "realizan", "grupo", "un"],
       correctOrder: ["un", "grupo", "realiza", "un", "proyecto"],
       hint: "Trabajo colaborativo",
     },
@@ -115,19 +115,19 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
   "6": [
     {
       id: "1",
-      words: ["científico", "método", "utilizan", "investigadores", "los"],
+      words: ["el", "científico", "método", "utilizan", "investigadores", "los"],
       correctOrder: ["los", "investigadores", "utilizan", "el", "método", "científico"],
       hint: "Oración académica",
     },
     {
       id: "2",
-      words: ["conclusiones", "analizan", "datos", "los", "científicos"],
+      words: ["los", "y", "conclusiones", "analizan", "datos", "los", "científicos"],
       correctOrder: ["los", "científicos", "analizan", "los", "datos", "y", "conclusiones"],
       hint: "Análisis científico",
     },
     {
       id: "3",
-      words: ["experimento", "realizan", "laboratorio", "en", "estudiantes", "los"],
+      words: ["el", "experimento", "un", "realizan", "laboratorio", "en", "estudiantes", "los"],
       correctOrder: ["los", "estudiantes", "realizan", "un", "experimento", "en", "el", "laboratorio"],
       hint: "Actividad práctica",
     },

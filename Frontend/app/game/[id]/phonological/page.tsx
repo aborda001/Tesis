@@ -25,7 +25,7 @@ const phonologicalGames: { [key: string]: SyllablePair[] } = {
   "3": [
     { id: "1", image: "🚗", word: "coche", syllables: ["che", "co"] },
     { id: "2", image: "🐕", word: "perro", syllables: ["rro", "pe"] },
-    { id: "3", image: "🌸", word: "flor", syllables: ["lor", "f"] },
+    { id: "3", image: "🌸", word: "flor", syllables: ["flor"] },
   ],
   "4": [
     { id: "1", image: "🎓", word: "escuela", syllables: ["la", "es", "cue"] },
