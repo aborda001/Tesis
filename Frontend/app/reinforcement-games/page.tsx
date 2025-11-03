@@ -101,7 +101,7 @@ export default function ReinforcementGamesPage() {
                 <h2 className="text-2xl font-bold text-center mb-2">{game.title}</h2>
                 <p className="text-center text-white text-opacity-90 mb-6 text-sm">{game.description}</p>
                 <button
-                  onClick={() => router.push(`/reinforcement-games/${game.id}`)}
+                  onClick={() => router.push(`/game/${game.id}`)}
                   className={`${game.buttonColor} w-full text-white font-semibold py-3 rounded-lg transition-colors`}
                 >
                   Comenzar
