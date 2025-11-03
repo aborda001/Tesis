@@ -3,12 +3,14 @@
 import { useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, Volume2 } from "lucide-react"
+import { CameraInline } from "@/components/camera-inline"
+import { Timer } from "@/components/timer"
 
 const words: { [key: string]: string[] } = {
-  "1": ["sol", "mesa"],
+  "1": ["sola", "mesa"],
 }
 
-const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any) => {
+const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any, tiempo: any, fecha: any) => {
   /* curl --location --request GET 'http://localhost:3100/api/actividades?alumnoId=68fa34f6a072759b4a541ae3' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -24,6 +26,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
     descripcion,
     puntaje,
     alumnoId: studentId,
+    tiempo: tiempo,
+    fecha: fecha
   });
 
 
@@ -38,6 +42,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
         descripcion,
         puntaje,
         alumnoId: studentId,
+        tiempo,
+        fecha
       }),
     }).then(async (res) => {
       if (!res.ok) {
@@ -61,6 +67,8 @@ export default function ListenRepeatGame() {
   const [feedback, setFeedback] = useState("")
   const [accuracy, setAccuracy] = useState(0)
   const [completedWords, setCompletedWords] = useState(0)
+  const [elapsed, setElapsed] = useState(0)
+  const [startTime] = useState(Date.now())
 
   const wordList = words[gradeId] || words["1"]
   const currentWord = wordList[currentWordIndex]
@@ -92,7 +100,9 @@ export default function ListenRepeatGame() {
         sendActividadResults(
           `Juego Escucha y Repite completado con precisión`,
           accuracy,
-          "Escucha y Repite"
+          "Escucha y Repite",
+          elapsed,
+          new Date().toISOString()
         )
 
         const newAccuracy = Math.round(((completedWords + 1) / wordList.length) * 100)
@@ -111,7 +121,9 @@ export default function ListenRepeatGame() {
         sendActividadResults(
           `Juego Escucha y Repite: palabra "${currentWord}", dijo "${transcript}"`,
           0,
-          "Escucha y Repite"
+          "Escucha y Repite",
+          elapsed,
+          new Date().toISOString()
         )
       }
     }
@@ -133,7 +145,9 @@ export default function ListenRepeatGame() {
       sendActividadResults(
         `Juego Escucha y Repite completado con precisión`,
         accuracy,
-        "Escucha y Repite"
+        "Escucha y Repite",
+        elapsed,
+        new Date().toISOString()
       )
     }
     router.push(`/game/${gradeId}/syllables`)
@@ -151,15 +165,20 @@ export default function ListenRepeatGame() {
             Volver
           </button>
           <h1 className="text-3xl font-bold text-blue-900">Escucha y Repite</h1>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-blue-900">Progreso</p>
-            <p className="text-2xl font-bold text-blue-600">
-              {completedWords}/{wordList.length}
-            </p>
+          <div className="flex flex-col items-end gap-2">
+            <Timer onTimeUpdate={setElapsed} startTime={startTime} />
+            <div className="text-right">
+              <p className="text-lg font-semibold text-blue-900">Progreso</p>
+              <p className="text-2xl font-bold text-blue-600">
+                {completedWords}/{wordList.length}
+              </p>
+            </div>
           </div>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-12 mb-6">
+          <CameraInline />
+
           <div className="text-center mb-8">
             <p className="text-gray-600 mb-4">
               Palabra {currentWordIndex + 1} de {wordList.length}
@@ -186,10 +205,11 @@ export default function ListenRepeatGame() {
 
           {feedback && (
             <div
-              className={`p-4 rounded-lg text-center font-semibold ${feedback.includes("Muy bien")
+              className={`p-4 rounded-lg text-center font-semibold ${
+                feedback.includes("Muy bien")
                   ? "bg-green-100 text-green-800 border-2 border-green-500"
                   : "bg-yellow-100 text-yellow-800 border-2 border-yellow-500"
-                }`}
+              }`}
             >
               {feedback}
             </div>

@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
+import { Timer } from "@/components/timer"
 
 interface SyntaxGame {
   id: string
@@ -144,6 +145,8 @@ export default function SyntaxGamePage() {
   const [selectedWords, setSelectedWords] = useState<string[]>([])
   const [correctCount, setCorrectCount] = useState(0)
   const [totalGames, setTotalGames] = useState(0)
+  const [elapsed, setElapsed] = useState(0)
+  const [startTime] = useState(Date.now())
 
   useEffect(() => {
     const gameList = syntaxGames[gradeId] || syntaxGames["1"]
@@ -197,11 +200,23 @@ export default function SyntaxGamePage() {
     }
   }
 
+  // if (!currentGame) {
+  //   return <div>Cargando...</div>
+  // }
+
+  // const shuffledWords = [...currentGame.words].sort(() => Math.random() - 0.5)
+
+  const shuffledWords = useMemo(() => {
+    if (!currentGame) return [] // evita error inicial
+    return [...currentGame.words].sort(() => Math.random() - 0.5)
+  }
+
+  , [currentGame?.id])
+
   if (!currentGame) {
     return <div>Cargando...</div>
   }
 
-  const shuffledWords = [...currentGame.words].sort(() => Math.random() - 0.5)
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-orange-50 to-red-100 p-8">
@@ -219,11 +234,14 @@ export default function SyntaxGamePage() {
             <h1 className="text-3xl font-bold text-orange-900">Estructura Sintáctica</h1>
             <p className="text-gray-600 mt-2">Grado {gradeId}</p>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-orange-900">Progreso</p>
-            <p className="text-2xl font-bold text-orange-600">
-              {currentGameIndex + 1}/{totalGames}
-            </p>
+          <div className="flex flex-col items-end gap-2">
+            <Timer onTimeUpdate={setElapsed} startTime={startTime} />
+            <div className="text-right">
+              <p className="text-lg font-semibold text-orange-900">Progreso</p>
+              <p className="text-2xl font-bold text-orange-600">
+                {currentGameIndex + 1}/{totalGames}
+              </p>
+            </div>
           </div>
         </div>
 

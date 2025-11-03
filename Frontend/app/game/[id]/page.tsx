@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
+import { Timer } from "@/components/timer"
 
 const typingTexts: { [key: string]: string } = {
   "2": "La casa es grande y tiene un jardín bonito.",
@@ -11,7 +12,7 @@ const typingTexts: { [key: string]: string } = {
   "6": "Los estudiantes juegan fútbol en el recreo.",
 }
 
-const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any) => {
+const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any, tiempo: any, fecha: any) => {
   /* curl --location --request GET 'http://localhost:3100/api/actividades?alumnoId=68fa34f6a072759b4a541ae3' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -27,6 +28,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
     descripcion,
     puntaje,
     alumnoId: studentId,
+    tiempo,
+    fecha
   });
 
 
@@ -41,6 +44,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
         descripcion,
         puntaje,
         alumnoId: studentId,
+        tiempo,
+        fecha
       }),
     }).then(async (res) => {
       if (!res.ok) {
@@ -63,6 +68,8 @@ export default function GamePage() {
   const [typingText, setTypingText] = useState("")
   const [accuracy, setAccuracy] = useState(0)
   const [isComplete, setIsComplete] = useState(false)
+  const [elapsed, setElapsed] = useState(0)
+  const [startTime] = useState(Date.now())
 
   useEffect(() => {
     // Obtener el texto según el grado
@@ -112,12 +119,16 @@ export default function GamePage() {
               sendActividadResults(
         `Juego de Escritura completado con precisión`,
         accuracy,
-        "Juego de Escritura"
+        "Juego de Escritura",
+        elapsed,
+        new Date().toISOString()
       )     } else {
         sendActividadResults(
           `Juego de Escritura completado con precisión baja`,
           accuracy,
-          "Juego de Escritura"
+          "Juego de Escritura",
+          elapsed,
+          new Date().toISOString()
         )
       }
     }
@@ -140,9 +151,12 @@ export default function GamePage() {
             <h1 className="text-3xl font-bold text-blue-900">Juego de Escritura</h1>
             <p className="text-gray-600 mt-2">Grado {gradeId}</p>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-blue-900">Precisión</p>
-            <p className="text-2xl font-bold text-blue-600">{accuracy}%</p>
+          <div className="flex flex-col items-end gap-2">
+            <Timer onTimeUpdate={setElapsed} startTime={startTime} />
+            <div className="text-right">
+              <p className="text-lg font-semibold text-blue-900">Precisión</p>
+              <p className="text-2xl font-bold text-blue-600">{accuracy}%</p>
+            </div>
           </div>
         </div>
 

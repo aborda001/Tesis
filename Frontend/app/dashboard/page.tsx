@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { BookOpen, Puzzle, Lightbulb, Zap, Microscope, Monitor } from "lucide-react"
+import { BookOpen, Puzzle, Lightbulb, Zap, Microscope, Monitor, Sparkles } from "lucide-react"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -112,6 +112,27 @@ export default function DashboardPage() {
               </div>
             )
           })}
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-3xl font-bold text-blue-900 mb-8">Juegos de Refuerzo</h2>
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl p-12 text-white shadow-lg hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <Sparkles size={64} className="drop-shadow-lg" />
+                <div>
+                  <h3 className="text-2xl font-bold mb-2">Práctica Adicional</h3>
+                  <p className="text-indigo-100">Refuerza tus habilidades con juegos especializados</p>
+                </div>
+              </div>
+              <button
+                onClick={() => router.push("/reinforcement-games")}
+                className="bg-white text-indigo-600 hover:bg-indigo-50 font-semibold py-3 px-8 rounded-lg transition-colors whitespace-nowrap"
+              >
+                Explorar Juegos
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </main>

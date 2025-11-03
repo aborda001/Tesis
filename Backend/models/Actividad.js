@@ -5,6 +5,8 @@ const ActividadSchema = new Schema(
     actividad: { type: String, required: true },
     descripcion: { type: String },
     puntaje: { type: Number, default: 0 },
+    fecha: { type: Date, default: Date.now },
+    tiempo: { type: Number, default: 0 }, // tiempo en segundos
   },
   { timestamps: true }
 );

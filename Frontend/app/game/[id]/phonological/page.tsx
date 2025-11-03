@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
+import { Timer } from "@/components/timer"
 
 interface SyllablePair {
   id: string
@@ -54,6 +55,8 @@ export default function PhonologicalGamePage() {
   const [selectedSyllables, setSelectedSyllables] = useState<string[]>([])
   const [correctCount, setCorrectCount] = useState(0)
   const [totalGames, setTotalGames] = useState(0)
+  const [elapsed, setElapsed] = useState(0)
+  const [startTime] = useState(Date.now())
 
   useEffect(() => {
     const gameList = phonologicalGames[gradeId] || phonologicalGames["1"]
@@ -111,11 +114,21 @@ export default function PhonologicalGamePage() {
     }
   }
 
+  // if (!currentGame) {
+  //   return <div>Cargando...</div>
+  // }
+
+  // const shuffledSyllables = [...currentGame.syllables].sort(() => Math.random() - 0.5)
+
+  const shuffledSyllables = useMemo(() => {
+    if (!currentGame) return [] // evita error inicial
+    return [...currentGame.syllables].sort(() => Math.random() - 0.5)
+  }, [currentGame?.id])
+
   if (!currentGame) {
     return <div>Cargando...</div>
   }
 
-  const shuffledSyllables = [...currentGame.syllables].sort(() => Math.random() - 0.5)
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 p-8">
@@ -133,11 +146,14 @@ export default function PhonologicalGamePage() {
             <h1 className="text-3xl font-bold text-purple-900">Conciencia Fonológica</h1>
             <p className="text-gray-600 mt-2">Grado {gradeId}</p>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-purple-900">Progreso</p>
-            <p className="text-2xl font-bold text-purple-600">
-              {currentGameIndex + 1}/{totalGames}
-            </p>
+          <div className="flex flex-col items-end gap-2">
+            <Timer onTimeUpdate={setElapsed} startTime={startTime} />
+            <div className="text-right">
+              <p className="text-lg font-semibold text-purple-900">Progreso</p>
+              <p className="text-2xl font-bold text-purple-600">
+                {currentGameIndex + 1}/{totalGames}
+              </p>
+            </div>
           </div>
         </div>
 

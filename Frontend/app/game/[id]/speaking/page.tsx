@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Mic } from "lucide-react"
 import { CameraInline } from "@/components/camera-inline"
+import { Timer } from "@/components/timer"
 
 const speakingTexts: { [key: string]: string } = {
   "1": "El perro corre rápido por el parque.",
@@ -15,7 +16,7 @@ const speakingTexts: { [key: string]: string } = {
   "6": "Los estudiantes juegan fútbol en el recreo.",
 }
 
-const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any) => {
+const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any, tiempo: any, fecha: any) => {
   /* curl --location --request GET 'http://localhost:3100/api/actividades?alumnoId=68fa34f6a072759b4a541ae3' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -31,6 +32,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
     descripcion,
     puntaje,
     alumnoId: studentId,
+    tiempo,
+    fecha
   });
 
 
@@ -45,6 +48,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
         descripcion,
         puntaje,
         alumnoId: studentId,
+        tiempo,
+        fecha
       }),
     }).then(async (res) => {
       if (!res.ok) {
@@ -66,6 +71,8 @@ export default function SpeakingGamePage() {
   const [speakingText, setSpeakingText] = useState("")
   const [isListening, setIsListening] = useState(false)
   const [recognizedText, setRecognizedText] = useState("")
+  const [elapsed, setElapsed] = useState(0)
+  const [startTime] = useState(Date.now())
 
   useEffect(() => {
     const text = speakingTexts[gradeId] || speakingTexts["1"]
@@ -140,7 +147,9 @@ export default function SpeakingGamePage() {
       sendActividadResults(
         `Juego de Lectura completado con precisión ${readingAccuracy}%`,
         readingAccuracy,
-        "Juego de Lectura"
+        "Juego de Lectura",
+        elapsed,
+        new Date().toISOString()
       )  
     }
     router.push(`/game/${gradeId}/phonological`)
@@ -162,7 +171,9 @@ export default function SpeakingGamePage() {
             <h1 className="text-3xl font-bold text-green-900">Juego de Lectura</h1>
             <p className="text-gray-600 mt-2">Grado {gradeId}</p>
           </div>
-          <div className="w-20" />
+          <div className="flex flex-col items-end gap-2">
+            <Timer onTimeUpdate={setElapsed} startTime={startTime} />
+          </div>
         </div>
 
         {/* Game Container */}

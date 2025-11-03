@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, Volume2 } from "lucide-react"
+import { Timer } from "@/components/timer"
 
 const syllableExercises: { [key: string]: Array<{ word: string; syllables: string[] }> } = {
   "1": [
@@ -14,7 +15,7 @@ const syllableExercises: { [key: string]: Array<{ word: string; syllables: strin
   ],
 }
 
-const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any) => {
+const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any, tiempo: any, fecha: any) => {
   /* curl --location --request GET 'http://localhost:3100/api/actividades?alumnoId=68fa34f6a072759b4a541ae3' \
 --header 'Content-Type: application/json' \
 --data '{
@@ -30,6 +31,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
     descripcion,
     puntaje,
     alumnoId: studentId,
+    tiempo: tiempo,
+    fecha: fecha,
   });
 
 
@@ -44,6 +47,8 @@ const sendActividadResults = async (descripcion: any, puntaje: any, actividad: a
         descripcion,
         puntaje,
         alumnoId: studentId,
+        tiempo,
+        fecha,
       }),
     }).then(async (res) => {
       if (!res.ok) {
@@ -68,10 +73,19 @@ export default function SyllablesGame() {
   const [feedback, setFeedback] = useState("")
   const [accuracy, setAccuracy] = useState(0)
   const [correctAnswers, setCorrectAnswers] = useState(0)
+  const [elapsed, setElapsed] = useState(0)
+  const [startTime] = useState(Date.now())
 
   const exerciseList = syllableExercises[gradeId] || syllableExercises["1"]
   const currentExercise = exerciseList[currentExerciseIndex]
-  const shuffledSyllables = [...currentExercise.syllables].sort(() => Math.random() - 0.5)
+  const [shuffledSyllables, setShuffledSyllables] = useState(() =>
+    [...currentExercise.syllables].sort(() => Math.random() - 0.5)
+  )
+
+  useEffect(() => {
+    setShuffledSyllables([...currentExercise.syllables].sort(() => Math.random() - 0.5))
+  }, [currentExerciseIndex])
+
 
   const speakWord = () => {
     const utterance = new SpeechSynthesisUtterance(currentExercise.word)
@@ -111,7 +125,9 @@ export default function SyllablesGame() {
       sendActividadResults(
         `Juego Sílabas Saltarinas completado con precisión, ha formado la palabra ${currentExercise.word} incorrectamente, puso ${selectedSyllables.join("")}`,
         0,
-        "Sílabas Saltarinas"
+        "Sílabas Saltarinas",
+        elapsed,
+        new Date().toISOString()
       )
     }
   }
@@ -140,7 +156,9 @@ export default function SyllablesGame() {
     sendActividadResults(
       `Juego Sílabas Saltarinas completado con precisión, ha completado ${correctAnswers} de ${exerciseList.length} palabras correctamente`,
       10 * (accuracy / 100),
-      "Sílabas Saltarinas"
+      "Sílabas Saltarinas",
+      elapsed,
+      new Date().toISOString()
     )
 
     router.push(`/game/${gradeId}/completion`)
@@ -158,9 +176,12 @@ export default function SyllablesGame() {
             Volver
           </button>
           <h1 className="text-3xl font-bold text-yellow-900">Sílabas Saltarinas</h1>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-yellow-900">Precisión</p>
-            <p className="text-2xl font-bold text-yellow-600">{accuracy}%</p>
+          <div className="flex flex-col items-end gap-2">
+            <Timer onTimeUpdate={setElapsed} startTime={startTime} />
+            <div className="text-right">
+              <p className="text-lg font-semibold text-yellow-900">Precisión</p>
+              <p className="text-2xl font-bold text-yellow-600">{accuracy}%</p>
+            </div>
           </div>
         </div>
 

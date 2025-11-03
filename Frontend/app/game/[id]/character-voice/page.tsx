@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, Mic } from "lucide-react"
 import { CameraInline } from "@/components/camera-inline"
+import { Timer } from "@/components/timer"
 
 const characters: { [key: string]: { name: string; emotion: string; example: string }[] } = {
   "2": [
@@ -23,6 +24,8 @@ export default function CharacterVoicePage() {
   const [isRecording, setIsRecording] = useState(false)
   const [accuracy, setAccuracy] = useState(0)
   const [completedCharacters, setCompletedCharacters] = useState<string[]>([])
+  const [startTime] = useState(Date.now())
+  const [elapsed, setElapsed] = useState(0)
 
   useEffect(() => {
     const chars = characters[gradeId] || characters["2"]
@@ -89,9 +92,12 @@ export default function CharacterVoicePage() {
             <h1 className="text-3xl font-bold text-purple-900">Habla como un personaje</h1>
             <p className="text-gray-600 mt-2">Imita diferentes emociones</p>
           </div>
-          <div className="text-right">
-            <p className="text-lg font-semibold text-purple-900">Entonación</p>
-            <p className="text-2xl font-bold text-purple-600">{accuracy}%</p>
+          <div className="flex flex-col items-end gap-2">
+            <Timer onTimeUpdate={setElapsed} startTime={startTime} />
+            <div className="text-right">
+              <p className="text-lg font-semibold text-purple-900">Entonación</p>
+              <p className="text-2xl font-bold text-purple-600">{accuracy}%</p>
+            </div>
           </div>
         </div>
 

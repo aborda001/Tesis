@@ -14,6 +14,8 @@ exports.create = async (req, res) => {
       actividad,
       descripcion,
       puntaje,
+      fecha: Date.now(),
+      tiempo: req.body.tiempo || 0,
     });
     await act.save();
     res.status(201).json(act);
