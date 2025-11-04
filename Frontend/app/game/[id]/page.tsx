@@ -75,8 +75,12 @@ export default function GamePage() {
     // Obtener el texto según el grado
     if (gradeId === "1") {
       router.push(`/game/${gradeId}/listen-repeat`)
+    } else if (gradeId === "2") {
+      router.push(`/game/${gradeId}/verbs`)
+    } else if (gradeId === "3") {
+      router.push(`/game/${gradeId}/connectors`)
     } else {
-      const text = typingTexts[gradeId] || typingTexts["2"]
+      const text = typingTexts[gradeId] || typingTexts["4"]
       setTypingText(text)
     }
   }, [gradeId, router])
@@ -103,12 +107,12 @@ export default function GamePage() {
   const getCharColor = (index: number) => {
     if (index < userInput.length) {
       if (userInput[index] === typingText[index]) {
-        return "text-black" // Correcto
+        return "text-black"
       } else {
-        return "text-red-500" // Incorrecto
+        return "text-red-500"
       }
     }
-    return "text-gray-400" // No escrito aún
+    return "text-gray-400"
   }
 
   const handleNextClick = () => {
@@ -217,7 +221,7 @@ export default function GamePage() {
 
         {/* Action Buttons */}
         <div className="flex gap-4 justify-center">
-          {gradeId !== "1" && (
+          {gradeId !== "1" && gradeId !== "2" && gradeId !== "3" && (
             <button
               onClick={() => {
                 setUserInput("")
@@ -229,7 +233,7 @@ export default function GamePage() {
               Reintentar
             </button>
           )}
-          {gradeId !== "1" && (
+          {gradeId !== "1" && gradeId !== "2" && gradeId !== "3" && (
             <button
               onClick={handleNextClick}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors"
