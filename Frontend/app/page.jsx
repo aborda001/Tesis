@@ -1,12 +1,14 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import LoginForm from "@/components/login-form";
-import RegisterModal from "@/components/register-modal";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import LoginForm from "@/components/login-form"
+import RegisterModal from "@/components/register-modal"
+import TeacherRegisterModal from "@/components/teacher-register-modal"
 
 export default function LoginPage() {
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isTeacherRegisterOpen, setIsTeacherRegisterOpen] = useState(false)
   const router = useRouter();
 
   const handleLogin = async (userId) => {
@@ -57,11 +59,10 @@ export default function LoginPage() {
         onLogin={handleLogin}
         onTeacherLogin={handleTeacherLogin}
         onRegisterClick={() => setIsRegisterOpen(true)}
+        onTeacherRegisterClick={() => setIsTeacherRegisterOpen(true)}
       />
-      <RegisterModal
-        isOpen={isRegisterOpen}
-        onClose={() => setIsRegisterOpen(false)}
-      />
+      <RegisterModal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} />
+      <TeacherRegisterModal isOpen={isTeacherRegisterOpen} onClose={() => setIsTeacherRegisterOpen(false)} />
     </main>
-  );
+  )
 }

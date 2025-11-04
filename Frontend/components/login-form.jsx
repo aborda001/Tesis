@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-export default function LoginForm({ onLogin, onTeacherLogin, onRegisterClick }) {
+export default function LoginForm({ onLogin, onTeacherLogin, onRegisterClick, onTeacherRegisterClick }) {
   const [userId, setUserId] = useState("")
   const [error, setError] = useState("")
   const [isTeacherMode, setIsTeacherMode] = useState(false)
@@ -164,25 +164,56 @@ export default function LoginForm({ onLogin, onTeacherLogin, onRegisterClick }) 
           </form>
 
           <div className="mt-6 space-y-3 text-center">
-            <p className="text-gray-600">
-              ¿No tienes un ID?{" "}
-              <button onClick={onRegisterClick} className="text-blue-600 font-semibold hover:underline cursor-pointer">
-                Regístrate aquí
-              </button>
-            </p>
-            <p className="text-gray-600">
-              ¿Eres un docente?{" "}
-              <button
-                onClick={() => {
-                  setIsTeacherMode(!isTeacherMode)
-                  setError("")
-                  setTeacherPassword("")
-                }}
-                className="text-blue-600 font-semibold hover:underline cursor-pointer"
-              >
-                {isTeacherMode ? "Volver a alumno" : "Acceder aquí"}
-              </button>
-            </p>
+            {!isTeacherMode ? (
+              <>
+                <p className="text-gray-600">
+                  ¿No tienes un ID?{" "}
+                  <button
+                    onClick={onRegisterClick}
+                    className="text-blue-600 font-semibold hover:underline cursor-pointer"
+                  >
+                    Regístrate aquí
+                  </button>
+                </p>
+                <p className="text-gray-600">
+                  ¿Eres un docente?{" "}
+                  <button
+                    onClick={() => {
+                      setIsTeacherMode(true)
+                      setError("")
+                      setTeacherPassword("")
+                    }}
+                    className="text-blue-600 font-semibold hover:underline cursor-pointer"
+                  >
+                    Acceder aquí
+                  </button>
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-600">
+                  ¿No estás registrado?{" "}
+                  <button
+                    onClick={onTeacherRegisterClick}
+                    className="text-blue-600 font-semibold hover:underline cursor-pointer"
+                  >
+                    Regístrate aquí
+                  </button>
+                </p>
+                <p className="text-gray-600">
+                  <button
+                    onClick={() => {
+                      setIsTeacherMode(false)
+                      setError("")
+                      setTeacherPassword("")
+                    }}
+                    className="text-blue-600 font-semibold hover:underline cursor-pointer"
+                  >
+                    Volver a alumno
+                  </button>
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
