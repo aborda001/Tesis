@@ -13,27 +13,22 @@ interface NarratorPrompt {
 
 const narratorPrompts: NarratorPrompt[] = [
   {
-    imageUrl: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop",
-    title: "Niños en el parque",
-    description: "Unos niños jugando en el parque"
-  },
-  {
-    imageUrl: "https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=800&h=600&fit=crop",
+    imageUrl: "https://i.ibb.co/3DBzMTf/Playa.jpg",
     title: "Familia en la playa",
     description: "Una familia disfrutando un día en la playa"
   },
   {
-    imageUrl: "https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=800&h=600&fit=crop",
+    imageUrl: "https://i.ibb.co/4RXbbW2h/Animales.jpg",
     title: "Animales en el bosque",
     description: "Animales en su hábitat natural"
   },
   {
-    imageUrl: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&h=600&fit=crop",
+    imageUrl: "https://i.ibb.co/Vp0VhBtL/Espacio.jpg",
     title: "Aventura espacial",
     description: "Una aventura en el espacio"
   },
   {
-    imageUrl: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&h=600&fit=crop",
+    imageUrl: "https://i.ibb.co/G4GzKP0S/Escuela.jpg",
     title: "Día de escuela",
     description: "Un día típico en la escuela"
   }

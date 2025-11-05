@@ -27,9 +27,9 @@ const transformExercises: TransformExercise[] = [
   },
   {
     original: "Nosotros estudiamos matemáticas",
-    tense: "Pasado",
-    correctAnswer: "Nosotros estudiamos matemáticas",
-    hints: ["El verbo 'estudiar' en pasado para 'nosotros' es 'estudiamos'"]
+    tense: "Futuro",
+    correctAnswer: "Nosotros estudiaremos matemáticas",
+    hints: ["El verbo 'estudiar' en futuro para 'nosotros' es 'estudiaremos'"]
   },
   {
     original: "Tú escribes una carta",
