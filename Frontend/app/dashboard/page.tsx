@@ -121,7 +121,7 @@ export default function DashboardPage() {
               <div className="flex items-center gap-6">
                 <Sparkles size={64} className="drop-shadow-lg" />
                 <div>
-                  <h3 className="text-2xl font-bold mb-2">Práctica Adicional</h3>
+                  <h3 className="text-2xl font-bold mb-2">Refuerzo de lectura</h3>
                   <p className="text-indigo-100">Refuerza tus habilidades con juegos especializados</p>
                 </div>
               </div>

@@ -79,6 +79,15 @@ export default function GamePage() {
       router.push(`/game/${gradeId}/verbs`)
     } else if (gradeId === "3") {
       router.push(`/game/${gradeId}/connectors`)
+    } else if (gradeId === "4") {
+      // Grado 4: Completar verbos y pronunciación con acento
+      router.push(`/game/${gradeId}/complete-verbs`)
+    } else if (gradeId === "5") {
+      // Grado 5: Mejorar oraciones y transformar tiempos verbales
+      router.push(`/game/${gradeId}/improve-sentence`)
+    } else if (gradeId === "6") {
+      // Grado 6: Signos de puntuación y narrador perfecto
+      router.push(`/game/${gradeId}/punctuation`)
     } else {
       const text = typingTexts[gradeId] || typingTexts["4"]
       setTypingText(text)
