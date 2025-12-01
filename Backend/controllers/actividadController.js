@@ -25,6 +25,6 @@ exports.create = async (req, res) => {
 };
 
 exports.getAll = async (req, res) => {
-  const acts = await Actividad.find({ alumno: req.query.alumnoId });
+  const acts = await Actividad.find({ alumno: req.query.alumnoId, }).sort({ fecha: -1 });
   res.json(acts);
 };

@@ -75,6 +75,7 @@ export default function SyllablesGame() {
   const [correctAnswers, setCorrectAnswers] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [startTime] = useState(Date.now())
+  const [attempts, setAttempts] = useState(0)
 
   const exerciseList = syllableExercises[gradeId] || syllableExercises["1"]
   const currentExercise = exerciseList[currentExerciseIndex]
@@ -104,6 +105,7 @@ export default function SyllablesGame() {
 
   const checkAnswer = () => {
     const isCorrect = selectedSyllables.join("") === currentExercise.word.toLowerCase()
+    setAttempts(attempts + 1)
 
     if (isCorrect) {
       setFeedback("¡Excelente! Formaste la palabra correctamente: " + currentExercise.word)
@@ -117,45 +119,20 @@ export default function SyllablesGame() {
           setSelectedSyllables([])
           setFeedback("")
         } else {
-          saveResults()
+          saveResults(correctAnswers + 1, attempts + 1)
         }
       }, 2000)
     } else {
       setFeedback("Intenta de nuevo. Ordena las sílabas correctamente.")
-      sendActividadResults(
-        `Juego Sílabas Saltarinas completado con precisión, ha formado la palabra ${currentExercise.word} incorrectamente, puso ${selectedSyllables.join("")}`,
-        0,
-        "Sílabas Saltarinas",
-        elapsed,
-        new Date().toISOString()
-      )
     }
   }
 
-  const saveResults = () => {
-    const studentId = localStorage.getItem("currentStudentId")
-    if (studentId) {
-      const gameResults = localStorage.getItem("gameResults")
-      const results = gameResults ? JSON.parse(gameResults) : {}
-
-      if (!results[studentId]) {
-        results[studentId] = []
-      }
-
-      results[studentId].push({
-        grade: gradeId,
-        gameType: "syllables",
-        accuracy: accuracy,
-        completedAt: new Date().toISOString(),
-      })
-
-      localStorage.setItem("gameResults", JSON.stringify(results))
-    }
-
-
+  const saveResults = (finalCorrectAnswers: number, totalAttempts: number) => {
+    const finalScore = Math.round((finalCorrectAnswers / totalAttempts) * 100)
+    
     sendActividadResults(
-      `Juego Sílabas Saltarinas completado con precisión, ha completado ${correctAnswers} de ${exerciseList.length} palabras correctamente`,
-      10 * (accuracy / 100),
+      `Juego Sílabas Saltarinas completado con ${finalCorrectAnswers}/${exerciseList.length} palabras correctas en ${totalAttempts} intentos`,
+      finalScore,
       "Sílabas Saltarinas",
       elapsed,
       new Date().toISOString()

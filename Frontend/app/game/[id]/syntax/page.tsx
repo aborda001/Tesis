@@ -135,6 +135,41 @@ const syntaxGames: { [key: string]: SyntaxGame[] } = {
   ],
 }
 
+const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any, tiempo: any, fecha: any) => {
+  const studentId = localStorage.getItem("userId")
+  console.log("Student ID:", studentId)
+  console.log("Datos a enviar", {
+    actividad,
+    descripcion,
+    puntaje,
+    alumnoId: studentId,
+    tiempo,
+    fecha
+  })
+
+  if (studentId) {
+    await fetch(`http://localhost:3100/api/actividades?alumnoId=${studentId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        actividad,
+        descripcion,
+        puntaje,
+        alumnoId: studentId,
+        tiempo,
+        fecha
+      }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        console.error("Error al enviar los resultados de la actividad")
+      }
+      console.log("Resultados de la actividad enviados correctamente:", await res.json())
+    })
+  }
+}
+
 export default function SyntaxGamePage() {
   const router = useRouter()
   const params = useParams()
@@ -147,6 +182,7 @@ export default function SyntaxGamePage() {
   const [totalGames, setTotalGames] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [startTime] = useState(Date.now())
+  const [attempts, setAttempts] = useState(0)
 
   useEffect(() => {
     const gameList = syntaxGames[gradeId] || syntaxGames["1"]
@@ -168,33 +204,27 @@ export default function SyntaxGamePage() {
 
   const handleCheck = () => {
     const isCorrect = selectedWords.join(" ") === currentGame.correctOrder.join(" ")
-
-    if (isCorrect) {
-      setCorrectCount(correctCount + 1)
-    }
+    const newCorrectCount = isCorrect ? correctCount + 1 : correctCount
+    const newAttempts = attempts + 1
+    setAttempts(newAttempts)
 
     if (currentGameIndex < games.length - 1) {
+      if (isCorrect) {
+        setCorrectCount(newCorrectCount)
+      }
       setCurrentGameIndex(currentGameIndex + 1)
       setSelectedWords([])
     } else {
-      // Save results and go to completion
-      const studentId = localStorage.getItem("currentStudentId")
-      if (studentId) {
-        const gameResults = localStorage.getItem("gameResults")
-        const results = gameResults ? JSON.parse(gameResults) : {}
-
-        if (!results[studentId]) {
-          results[studentId] = []
-        }
-
-        const lastResult = results[studentId][results[studentId].length - 1]
-        if (lastResult && lastResult.grade === gradeId) {
-          lastResult.syntaxAccuracy = Math.round((correctCount / totalGames) * 100)
-        }
-
-        localStorage.setItem("gameResults", JSON.stringify(results))
+      // Enviar resultados al backend con el conteo final correcto
+      const finalScore = Math.round((newCorrectCount / newAttempts) * 100)
       
-      }
+      sendActividadResults(
+        `Juego de sintaxis completado con ${newCorrectCount}/${totalGames} respuestas correctas en ${newAttempts} intentos`,
+        finalScore,
+        "Sintaxis",
+        elapsed,
+        new Date().toISOString()
+      )
 
       router.push(`/game/${gradeId}/character-voice`)
     }

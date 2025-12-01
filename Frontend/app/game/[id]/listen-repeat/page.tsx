@@ -69,6 +69,7 @@ export default function ListenRepeatGame() {
   const [completedWords, setCompletedWords] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [startTime] = useState(Date.now())
+  const [attempts, setAttempts] = useState(0)
 
   const wordList = words[gradeId] || words["1"]
   const currentWord = wordList[currentWordIndex]
@@ -96,14 +97,7 @@ export default function ListenRepeatGame() {
       if (isCorrect) {
         setFeedback("¡Muy bien! Dijiste correctamente: " + currentWord)
         setCompletedWords(completedWords + 1)
-
-        sendActividadResults(
-          `Juego Escucha y Repite completado con precisión`,
-          accuracy,
-          "Escucha y Repite",
-          elapsed,
-          new Date().toISOString()
-        )
+        setAttempts(attempts + 1)
 
         const newAccuracy = Math.round(((completedWords + 1) / wordList.length) * 100)
         setAccuracy(newAccuracy)
@@ -113,18 +107,12 @@ export default function ListenRepeatGame() {
             setCurrentWordIndex(currentWordIndex + 1)
             setFeedback("")
           } else {
-            saveResults()
+            saveResults(completedWords + 1)
           }
         }, 2000)
       } else {
+        setAttempts(attempts + 1)
         setFeedback(`Intenta de nuevo. Dijiste: "${transcript}", pero la palabra es: "${currentWord}"`)
-        sendActividadResults(
-          `Juego Escucha y Repite: palabra "${currentWord}", dijo "${transcript}"`,
-          0,
-          "Escucha y Repite",
-          elapsed,
-          new Date().toISOString()
-        )
       }
     }
 
@@ -139,17 +127,17 @@ export default function ListenRepeatGame() {
     recognition.start()
   }
 
-  const saveResults = () => {
-    const studentId = localStorage.getItem("currentStudentId")
-    if (studentId) {
-      sendActividadResults(
-        `Juego Escucha y Repite completado con precisión`,
-        accuracy,
-        "Escucha y Repite",
-        elapsed,
-        new Date().toISOString()
-      )
-    }
+  const saveResults = (finalCompletedWords: number) => {
+    const finalScore = Math.round((finalCompletedWords / attempts) * 100)
+    
+    sendActividadResults(
+      `Juego Escucha y Repite completado con ${finalCompletedWords}/${wordList.length} palabras correctas en ${attempts} intentos`,
+      finalScore,
+      "Escucha y Repite",
+      elapsed,
+      new Date().toISOString()
+    )
+    
     router.push(`/game/${gradeId}/syllables`)
   }
 

@@ -12,6 +12,41 @@ interface VerbQuestion {
   options: string[]
 }
 
+const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any, tiempo: any, fecha: any) => {
+  const studentId = localStorage.getItem("userId")
+  console.log("Student ID:", studentId)
+  console.log("Datos a enviar", {
+    actividad,
+    descripcion,
+    puntaje,
+    alumnoId: studentId,
+    tiempo,
+    fecha
+  })
+
+  if (studentId) {
+    await fetch(`http://localhost:3100/api/actividades?alumnoId=${studentId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        actividad,
+        descripcion,
+        puntaje,
+        alumnoId: studentId,
+        tiempo,
+        fecha
+      }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        console.error("Error al enviar los resultados de la actividad")
+      }
+      console.log("Resultados de la actividad enviados correctamente:", await res.json())
+    })
+  }
+}
+
 const verbGames: { [key: string]: VerbQuestion[] } = {
   "2": [
     {
@@ -60,6 +95,7 @@ export default function VerbsGamePage() {
   const [message, setMessage] = useState("")
   const [elapsed, setElapsed] = useState(0)
   const [startTime] = useState(Date.now())
+  const [attempts, setAttempts] = useState(0)
 
   useEffect(() => {
     const gameList = verbGames[gradeId] || verbGames["2"]
@@ -82,9 +118,12 @@ export default function VerbsGamePage() {
   const handleSelectOption = (option: string) => {
     if (selectedOption === "") {
       setSelectedOption(option)
+      const newAttempts = attempts + 1
+      setAttempts(newAttempts)
 
       if (option === currentGame.correctVerb) {
-        setCorrectCount(correctCount + 1)
+        const newCorrectCount = correctCount + 1
+        setCorrectCount(newCorrectCount)
         setMessage("¡Correcto! 🎉")
         setTimeout(() => {
           if (currentGameIndex < games.length - 1) {
@@ -92,7 +131,7 @@ export default function VerbsGamePage() {
             setSelectedOption("")
             setMessage("")
           } else {
-            handleComplete()
+            handleComplete(newCorrectCount, newAttempts)
           }
         }, 1500)
       } else {
@@ -105,24 +144,17 @@ export default function VerbsGamePage() {
     }
   }
 
-  const handleComplete = () => {
-    const studentId = localStorage.getItem("currentStudentId")
-    if (studentId) {
-      const gameResults = localStorage.getItem("gameResults")
-      const results = gameResults ? JSON.parse(gameResults) : {}
-
-      if (!results[studentId]) {
-        results[studentId] = []
-      }
-
-      const lastResult = results[studentId][results[studentId].length - 1]
-      if (lastResult && lastResult.grade === gradeId) {
-        lastResult.verbsAccuracy = Math.round((correctCount / totalGames) * 100)
-        lastResult.verbsTime = elapsed
-      }
-
-      localStorage.setItem("gameResults", JSON.stringify(results))
-    }
+  const handleComplete = (finalCorrectCount: number, totalAttempts: number) => {
+    const finalScore = Math.round((finalCorrectCount / totalAttempts) * 100)
+    
+    sendActividadResults(
+      `Juego de reconocimiento de verbos completado con ${finalCorrectCount}/${totalGames} respuestas correctas en ${totalAttempts} intentos`,
+      finalScore,
+      "Reconocimiento de Verbos",
+      elapsed,
+      new Date().toISOString()
+    )
+    
     router.push(`/game/${gradeId}/phonological`)
   }
 

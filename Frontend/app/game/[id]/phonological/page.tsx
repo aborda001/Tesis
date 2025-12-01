@@ -45,6 +45,41 @@ const phonologicalGames: { [key: string]: SyllablePair[] } = {
   ],
 }
 
+const sendActividadResults = async (descripcion: any, puntaje: any, actividad: any, tiempo: any, fecha: any) => {
+  const studentId = localStorage.getItem("userId")
+  console.log("Student ID:", studentId)
+  console.log("Datos a enviar", {
+    actividad,
+    descripcion,
+    puntaje,
+    alumnoId: studentId,
+    tiempo,
+    fecha
+  })
+
+  if (studentId) {
+    await fetch(`http://localhost:3100/api/actividades?alumnoId=${studentId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        actividad,
+        descripcion,
+        puntaje,
+        alumnoId: studentId,
+        tiempo,
+        fecha
+      }),
+    }).then(async (res) => {
+      if (!res.ok) {
+        console.error("Error al enviar los resultados de la actividad")
+      }
+      console.log("Resultados de la actividad enviados correctamente:", await res.json())
+    })
+  }
+}
+
 export default function PhonologicalGamePage() {
   const router = useRouter()
   const params = useParams()
@@ -57,6 +92,7 @@ export default function PhonologicalGamePage() {
   const [totalGames, setTotalGames] = useState(0)
   const [elapsed, setElapsed] = useState(0)
   const [startTime] = useState(Date.now())
+  const [attempts, setAttempts] = useState(0)
 
   useEffect(() => {
     const gameList = phonologicalGames[gradeId] || phonologicalGames["1"]
@@ -84,32 +120,28 @@ export default function PhonologicalGamePage() {
     })
 
     const isCorrect = selectedSyllables.join("") === currentGame.word
-
-    if (isCorrect) {
-      setCorrectCount(correctCount + 1)
-    }
+    const newCorrectCount = isCorrect ? correctCount + 1 : correctCount
+    const newAttempts = attempts + 1
+    setAttempts(newAttempts)
 
     if (currentGameIndex < games.length - 1) {
+      if (isCorrect) {
+        setCorrectCount(newCorrectCount)
+      }
       setCurrentGameIndex(currentGameIndex + 1)
       setSelectedSyllables([])
     } else {
-      // Save results and go to next game
-      const studentId = localStorage.getItem("currentStudentId")
-      if (studentId) {
-        const gameResults = localStorage.getItem("gameResults")
-        const results = gameResults ? JSON.parse(gameResults) : {}
-
-        if (!results[studentId]) {
-          results[studentId] = []
-        }
-
-        const lastResult = results[studentId][results[studentId].length - 1]
-        if (lastResult && lastResult.grade === gradeId) {
-          lastResult.phonologicalAccuracy = Math.round((correctCount / totalGames) * 100)
-        }
-
-        localStorage.setItem("gameResults", JSON.stringify(results))
-      }
+      // Enviar resultados al backend con el conteo final correcto
+      const finalScore = Math.round((newCorrectCount / newAttempts) * 100)
+      
+      sendActividadResults(
+        `Juego de conciencia fonológica completado con ${newCorrectCount}/${totalGames} respuestas correctas en ${newAttempts} intentos`,
+        finalScore,
+        "Conciencia Fonológica",
+        elapsed,
+        new Date().toISOString()
+      )
+      
       router.push(`/game/${gradeId}/syntax`)
     }
   }

@@ -66,16 +66,45 @@ export default function SpeakingGamePage() {
     recognition.start()
   }
 
-  const handleNextClick = () => {
-    const studentId = localStorage.getItem("currentStudentId")
-    if (studentId && recognizedText) {
-      const gameResults = localStorage.getItem("gameResults")
-      const results = gameResults ? JSON.parse(gameResults) : {}
-
-      if (!results[studentId]) {
-        results[studentId] = []
+  const sendActividadResults = async (
+    descripcion: string,
+    puntaje: number,
+    actividad: string,
+    tiempo: number,
+    fecha: string
+  ) => {
+    try {
+      const studentId = localStorage.getItem("userId")
+      if (!studentId) {
+        console.error("No se encontró el ID del estudiante")
+        return
       }
 
+      const response = await fetch(`http://localhost:3100/api/actividades?alumnoId=${studentId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          actividad,
+          descripcion,
+          puntaje,
+          alumnoId: studentId,
+          tiempo,
+          fecha,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al enviar resultados")
+      }
+    } catch (error) {
+      console.error("Error:", error)
+    }
+  }
+
+  const handleNextClick = async () => {
+    if (recognizedText) {
       let correctChars = 0
       const minLength = Math.min(recognizedText.length, speakingText.length)
       for (let i = 0; i < minLength; i++) {
@@ -84,17 +113,14 @@ export default function SpeakingGamePage() {
         }
       }
       const readingAccuracy = Math.round((correctChars / speakingText.length) * 100)
-
-      // Find and update the last result for this student and grade
-      if (results[studentId].length > 0) {
-        const lastResult = results[studentId][results[studentId].length - 1]
-        if (lastResult.grade === gradeId) {
-          lastResult.readingCompleted = true
-          lastResult.readingAccuracy = readingAccuracy
-        }
-      }
-
-      localStorage.setItem("gameResults", JSON.stringify(results))
+      
+      await sendActividadResults(
+        "Lectura fluida",
+        readingAccuracy,
+        "Lectura fluida",
+        0,
+        new Date().toISOString()
+      )
     }
     router.push(`/game/${gradeId}/phonological`)
   }

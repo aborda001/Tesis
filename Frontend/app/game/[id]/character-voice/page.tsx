@@ -52,25 +52,52 @@ export default function CharacterVoicePage() {
     }
   }
 
-  const handleNext = () => {
-    const studentId = localStorage.getItem("currentStudentId")
-    if (studentId) {
-      const gameResults = localStorage.getItem("gameResults")
-      const results = gameResults ? JSON.parse(gameResults) : {}
-
-      if (!results[studentId]) {
-        results[studentId] = []
+  const sendActividadResults = async (
+    descripcion: string,
+    puntaje: number,
+    actividad: string,
+    tiempo: number,
+    fecha: string
+  ) => {
+    try {
+      const studentId = localStorage.getItem("userId")
+      if (!studentId) {
+        console.error("No se encontró el ID del estudiante")
+        return
       }
 
-      results[studentId].push({
-        grade: gradeId,
-        gameType: "characterVoice",
-        accuracy: accuracy,
-        completedAt: new Date().toISOString(),
+      const response = await fetch(`http://localhost:3100/api/actividades?alumnoId=${studentId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          actividad,
+          descripcion,
+          puntaje,
+          alumnoId: studentId,
+          tiempo,
+          fecha,
+        }),
       })
 
-      localStorage.setItem("gameResults", JSON.stringify(results))
+      if (!response.ok) {
+        throw new Error("Error al enviar resultados")
+      }
+    } catch (error) {
+      console.error("Error:", error)
     }
+  }
+
+  const handleNext = async () => {
+    const finalScore = accuracy
+    await sendActividadResults(
+      "Hablar como un personaje",
+      finalScore,
+      "Habla como un personaje",
+      elapsed,
+      new Date().toISOString()
+    )
     router.push(`/game/${gradeId}/completion`)
   }
 
