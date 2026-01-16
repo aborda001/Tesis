@@ -1,4 +1,4 @@
-"use client"
+"EspAaniamleuse client"
 
 import { useEffect, useState, useRef } from "react"
 import { useRouter, useParams } from "next/navigation"
@@ -13,22 +13,22 @@ interface NarratorPrompt {
 
 const narratorPrompts: NarratorPrompt[] = [
   {
-    imageUrl: "https://i.ibb.co/3DBzMTf/Playa.jpg",
+    imageUrl: "https://i.ibb.co/xtwQf6QC/Playa.jpg",
     title: "Familia en la playa",
     description: "Una familia disfrutando un día en la playa"
   },
   {
-    imageUrl: "https://i.ibb.co/4RXbbW2h/Animales.jpg",
+    imageUrl: "https://i.ibb.co/MxYWcvfh/Animales.jpg",
     title: "Animales en el bosque",
     description: "Animales en su hábitat natural"
   },
   {
-    imageUrl: "https://i.ibb.co/Vp0VhBtL/Espacio.jpg",
+    imageUrl: "https://i.ibb.co/mFMLdbFk/Espacio.jpg",
     title: "Aventura espacial",
     description: "Una aventura en el espacio"
   },
   {
-    imageUrl: "https://i.ibb.co/G4GzKP0S/Escuela.jpg",
+    imageUrl: "https://i.ibb.co/dJ4p6my7/Escuela.jpg",
     title: "Día de escuela",
     description: "Un día típico en la escuela"
   }
