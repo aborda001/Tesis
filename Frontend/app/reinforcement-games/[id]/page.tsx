@@ -6,7 +6,15 @@ import { ArrowLeft, Mic, Square } from "lucide-react"
 import { CameraInline } from "@/components/camera-inline"
 import { Timer } from "@/components/timer"
 
-// 🔍 Función de comparación palabra por palabra
+// Declaraciones de tipos para Web Speech API
+declare global {
+  interface Window {
+    SpeechRecognition: any
+    webkitSpeechRecognition: any
+  }
+}
+
+// 🔍 Función de comparación palabra por palabra con alineación flexible
 function compareReading(expectedText: string, spokenText: string) {
   const clean = (t: string) =>
     t.replace(/[^\wáéíóúüñ\s]/gi, "").toLowerCase().split(/\s+/).filter(Boolean)
@@ -14,10 +22,32 @@ function compareReading(expectedText: string, spokenText: string) {
   const expected = clean(expectedText)
   const spoken = clean(spokenText)
 
-  const comparison = expected.map((word, i) => ({
-    word,
-    correct: spoken[i] === word,
-  }))
+  // Índice de seguimiento para palabras habladas
+  let spokenIndex = 0
+  
+  const comparison = expected.map((word) => {
+    // Buscar la palabra esperada en las siguientes palabras habladas (ventana de búsqueda)
+    let found = false
+    let searchLimit = Math.min(spokenIndex + 3, spoken.length) // Buscar en las próximas 3 palabras
+    
+    for (let i = spokenIndex; i < searchLimit; i++) {
+      if (spoken[i] === word) {
+        found = true
+        spokenIndex = i + 1 // Avanzar el índice después de la palabra encontrada
+        break
+      }
+    }
+    
+    // Si no se encontró en la ventana, marcar como incorrecto y avanzar solo 1 posición
+    if (!found && spokenIndex < spoken.length) {
+      spokenIndex++
+    }
+    
+    return {
+      word,
+      correct: found,
+    }
+  })
 
   const correctCount = comparison.filter((w) => w.correct).length
   const score = Math.max(1, Math.round((correctCount / expected.length) * 10))
@@ -44,7 +74,7 @@ export default function ExtendedReadingPage() {
   const startTimeRef = useRef(Date.now())
 
   // Textos para cada ciclo
-  const textsByGrade = useMemo(
+  const textsByGrade: Record<number, string[]> = useMemo(
     () => ({
       1: [
         "🌳 Un día en la plaza\nHoy Lucía fue a la plaza con su mamá.\nEl sol brillaba y los pájaros cantaban.\nLucía corrió por el pasto y saludó a sus amigos.\nJuntos jugaron a la pelota y compartieron una merienda.\nCuando se hizo tarde, todos ayudaron a juntar la basura.\nLucía se sintió feliz porque cuidaron el lugar donde juegan.",
@@ -60,7 +90,9 @@ export default function ExtendedReadingPage() {
     const storedUserId = localStorage.getItem("currentStudentId")
     if (storedUserId) setUserId(storedUserId)
 
-    const textsArray = textsByGrade[cycleId] || textsByGrade[1]
+    // Convertir cycleId a número para usar como índice
+    const cycleKey = Array.isArray(cycleId) ? parseInt(cycleId[0]) : parseInt(cycleId as string)
+    const textsArray = textsByGrade[cycleKey] || textsByGrade[1]
     const randomText = textsArray[Math.floor(Math.random() * textsArray.length)]
     setCurrentText(randomText)
   }, [cycleId, textsByGrade])
@@ -77,7 +109,7 @@ export default function ExtendedReadingPage() {
 
       let accumulatedText = ""
 
-      recognition.onresult = (event) => {
+      recognition.onresult = (event: any) => {
         let interimText = ""
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
