@@ -6,6 +6,7 @@ import os
 import tempfile
 import logging
 import subprocess
+import time
 from pydub import AudioSegment
 
 app = Flask(__name__)
@@ -14,6 +15,29 @@ CORS(app)
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def safe_remove_file(filepath, max_attempts=5, delay=0.3):
+    """
+    Elimina un archivo de forma segura con reintentos
+    para evitar errores de PermissionError en Windows
+    """
+    for attempt in range(max_attempts):
+        try:
+            if os.path.exists(filepath):
+                os.unlink(filepath)
+                logger.info(f"Archivo eliminado exitosamente: {filepath}")
+            return True
+        except PermissionError as e:
+            if attempt < max_attempts - 1:
+                logger.warning(f"Intento {attempt + 1} falló al eliminar {filepath}, reintentando...")
+                time.sleep(delay)
+            else:
+                logger.error(f"No se pudo eliminar {filepath} después de {max_attempts} intentos: {e}")
+                return False
+        except Exception as e:
+            logger.error(f"Error inesperado al eliminar {filepath}: {e}")
+            return False
+    return False
 
 def convert_webm_to_wav(webm_path):
     """
@@ -36,6 +60,10 @@ def convert_webm_to_wav(webm_path):
         
         # Exportar como WAV
         audio.export(wav_path, format="wav")
+        
+        # Cerrar explícitamente el objeto audio para liberar el archivo
+        del audio
+        time.sleep(0.1)  # Pequeña espera para asegurar que se libere el archivo
         
         logger.info(f"Audio convertido exitosamente a {wav_path}")
         return wav_path
@@ -329,11 +357,14 @@ def analyze_emotion():
             # Calcular precisión de la emoción
             accuracy = calculate_emotion_accuracy(features, target_emotion)
             
-            # Limpiar archivos temporales
-            if webm_path and os.path.exists(webm_path):
-                os.unlink(webm_path)
-            if wav_path and os.path.exists(wav_path):
-                os.unlink(wav_path)
+            # Esperar un momento para asegurar que todos los procesos terminen
+            time.sleep(0.2)
+            
+            # Limpiar archivos temporales de forma segura
+            if webm_path:
+                safe_remove_file(webm_path)
+            if wav_path:
+                safe_remove_file(wav_path)
             webm_path = None
             wav_path = None
             
@@ -352,28 +383,26 @@ def analyze_emotion():
         
         except Exception as e:
             logger.error(f"Error durante el análisis: {str(e)}", exc_info=True)
+            # Esperar un momento antes de limpiar
+            time.sleep(0.2)
             # Limpiar archivos temporales en caso de error
-            if webm_path and os.path.exists(webm_path):
-                os.unlink(webm_path)
-            if wav_path and os.path.exists(wav_path):
-                os.unlink(wav_path)
+            if webm_path:
+                safe_remove_file(webm_path)
+            if wav_path:
+                safe_remove_file(wav_path)
             webm_path = None
             wav_path = None
             raise
     
     except Exception as e:
         logger.error(f"Error procesando audio: {str(e)}", exc_info=True)
+        # Esperar un momento antes de limpiar
+        time.sleep(0.2)
         # Asegurarse de limpiar los archivos temporales
-        if webm_path and os.path.exists(webm_path):
-            try:
-                os.unlink(webm_path)
-            except:
-                pass
-        if wav_path and os.path.exists(wav_path):
-            try:
-                os.unlink(wav_path)
-            except:
-                pass
+        if webm_path:
+            safe_remove_file(webm_path)
+        if wav_path:
+            safe_remove_file(wav_path)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/health', methods=['GET'])
