@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { ArrowLeft, Mic } from "lucide-react"
 import { CameraInline } from "@/components/camera-inline"
@@ -26,6 +26,10 @@ export default function CharacterVoicePage() {
   const [completedCharacters, setCompletedCharacters] = useState<string[]>([])
   const [startTime] = useState(Date.now())
   const [elapsed, setElapsed] = useState(0)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
 
   useEffect(() => {
     const chars = characters[gradeId] || characters["2"]
@@ -37,18 +41,77 @@ export default function CharacterVoicePage() {
     setAccuracy(0)
   }
 
-  const handleRecordCharacter = () => {
-    if (selectedCharacter && !isRecording) {
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      mediaRecorderRef.current = mediaRecorder
+      audioChunksRef.current = []
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data)
+        }
+      }
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        await analyzeEmotion(audioBlob)
+        
+        // Detener todos los tracks del stream
+        stream.getTracks().forEach(track => track.stop())
+      }
+
+      mediaRecorder.start()
       setIsRecording(true)
-    } else if (isRecording) {
+    } catch (error) {
+      console.error("Error al acceder al micrófono:", error)
+      alert("No se pudo acceder al micrófono. Por favor, permite el acceso al micrófono.")
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop()
       setIsRecording(false)
-      // Simular evaluación
-      const simulatedAccuracy = Math.floor(Math.random() * 30) + 70
-      setAccuracy(simulatedAccuracy)
+      setIsAnalyzing(true)
+    }
+  }
+
+  const analyzeEmotion = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData()
+      formData.append('audio', audioBlob, 'recording.webm')
+      formData.append('emotion', currentCharacter?.emotion || 'happy')
+
+      const response = await fetch('http://localhost:3100/api/analyze-emotion', {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        throw new Error('Error al analizar la emoción')
+      }
+
+      const result = await response.json()
+      setAccuracy(Math.round(result.accuracy))
 
       if (!completedCharacters?.includes(selectedCharacter)) {
         setCompletedCharacters([...completedCharacters, selectedCharacter])
       }
+    } catch (error) {
+      console.error("Error al analizar emoción:", error)
+      alert("Error al analizar el audio. Asegúrate de que el servidor esté corriendo.")
+    } finally {
+      setIsAnalyzing(false)
+    }
+  }
+
+  const handleRecordCharacter = () => {
+    if (selectedCharacter && !isRecording && !isAnalyzing) {
+      startRecording()
+    } else if (isRecording) {
+      stopRecording()
     }
   }
 
@@ -163,7 +226,34 @@ export default function CharacterVoicePage() {
           {currentCharacter && (
             <div className="mb-8 p-6 bg-purple-50 rounded-lg border-2 border-purple-200">
               <p className="text-sm text-gray-600 mb-2">Ejemplo de {currentCharacter.name.toLowerCase()}:</p>
-              <p className="text-xl font-semibold text-purple-900 italic">"{currentCharacter.example}"</p>
+              <p className="text-xl font-semibold text-purple-900 italic mb-4">"{currentCharacter.example}"</p>
+              
+              <div className="mt-4 p-3 bg-blue-50 rounded border-l-4 border-blue-400">
+                <p className="text-sm font-semibold text-blue-800 mb-2">💡 Tips para esta emoción:</p>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  {currentCharacter.emotion === 'happy' && (
+                    <>
+                      <li>• Habla con energía y entusiasmo</li>
+                      <li>• Sube el tono de tu voz</li>
+                      <li>• Habla más rápido de lo normal</li>
+                    </>
+                  )}
+                  {currentCharacter.emotion === 'sad' && (
+                    <>
+                      <li>• Habla suavemente y despacio</li>
+                      <li>• Baja el tono de tu voz</li>
+                      <li>• Habla de forma monótona</li>
+                    </>
+                  )}
+                  {currentCharacter.emotion === 'angry' && (
+                    <>
+                      <li>• Habla fuerte y con intensidad</li>
+                      <li>• Varía mucho el tono de tu voz</li>
+                      <li>• Habla rápido y con firmeza</li>
+                    </>
+                  )}
+                </ul>
+              </div>
             </div>
           )}
 
@@ -176,21 +266,47 @@ export default function CharacterVoicePage() {
               <div className="flex justify-center">
                 <button
                   onClick={handleRecordCharacter}
+                  disabled={isAnalyzing}
                   className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-colors ${
-                    isRecording ? "bg-red-500 hover:bg-red-600" : "bg-purple-600 hover:bg-purple-700"
-                  } cursor-pointer`}
+                    isRecording 
+                      ? "bg-red-500 hover:bg-red-600" 
+                      : isAnalyzing
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-purple-600 hover:bg-purple-700"
+                  } cursor-pointer disabled:cursor-not-allowed`}
                 >
                   <Mic size={20} />
-                  {isRecording ? "Detener grabación" : "Grabar"}
+                  {isRecording ? "Detener grabación" : isAnalyzing ? "Analizando..." : "Grabar"}
                 </button>
               </div>
             </div>
           )}
 
           {accuracy > 0 && (
-            <div className="bg-green-100 border-2 border-green-500 rounded-lg p-4 mb-6">
-              <p className="text-green-800 font-semibold text-center">
-                ¡Excelente entonación!
+            <div className={`border-2 rounded-lg p-4 mb-6 ${
+              accuracy >= 80 ? 'bg-green-100 border-green-500' :
+              accuracy >= 60 ? 'bg-yellow-100 border-yellow-500' :
+              accuracy >= 40 ? 'bg-orange-100 border-orange-500' :
+              'bg-red-100 border-red-500'
+            }`}>
+              <p className={`font-semibold text-center text-lg mb-2 ${
+                accuracy >= 80 ? 'text-green-800' :
+                accuracy >= 60 ? 'text-yellow-800' :
+                accuracy >= 40 ? 'text-orange-800' :
+                'text-red-800'
+              }`}>
+                Precisión: {accuracy}%
+              </p>
+              <p className={`text-center ${
+                accuracy >= 80 ? 'text-green-700' :
+                accuracy >= 60 ? 'text-yellow-700' :
+                accuracy >= 40 ? 'text-orange-700' :
+                'text-red-700'
+              }`}>
+                {accuracy >= 80 ? '¡Excelente! Capturaste muy bien la emoción' :
+                 accuracy >= 60 ? 'Bien hecho, pero puedes ser más expresivo' :
+                 accuracy >= 40 ? 'Intenta expresar más la emoción con tu voz' :
+                 'Necesitas más expresividad. ¡Inténtalo de nuevo!'}
               </p>
             </div>
           )}
